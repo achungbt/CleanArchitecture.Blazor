@@ -10,25 +10,32 @@ public partial class MainLayout
     async void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
-        await localStorage.SetItemAsync("drawer-open", _drawerOpen);
+        await LocalStorage.SetItemAsync("drawer-open", _drawerOpen);
     }
-    [Inject] public NavigationManager MyNavigationManager { get; set; } = default!;
-    [Inject] public Blazored.LocalStorage.ILocalStorageService localStorage { get; set; }
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] public Blazored.LocalStorage.ILocalStorageService LocalStorage { get; set; } = default!;
+    [Inject] public AppState AppState  { get; set; } = default!;
     bool _isAdmin;
-    bool _isDarkMode = false;
-    private string ModeIcon => _isDarkMode ? Icons.Filled.DarkMode : Icons.Filled.LightMode;
+    private bool _isDarkMode;
+    private string ModeIcon => !_isDarkMode ? Icons.Filled.DarkMode : Icons.Filled.LightMode;
 
     private async void ToggleDark()
     { 
         _isDarkMode = !_isDarkMode;
-        await localStorage.SetItemAsync("dark-mode", _isDarkMode);
+        
+        await LocalStorage.SetItemAsync("dark-mode", _isDarkMode);
+        AppState.SetThemMode(_isDarkMode);
     }
    
     protected override async Task OnInitializedAsync()
     {
-        _isAdmin = MyNavigationManager.ToBaseRelativePath(MyNavigationManager.Uri).StartsWith("admin");
-        _isDarkMode = await localStorage.GetItemAsync<bool>("dark-mode");
-        _drawerOpen = await localStorage.GetItemAsync<bool>("drawer-open");
+        _isAdmin = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("admin");
+        _isDarkMode = await LocalStorage.GetItemAsync<bool>("dark-mode");
+        _drawerOpen = await LocalStorage.GetItemAsync<bool>("drawer-open");
+        if (_isDarkMode != AppState.IsDarkMode)
+        {
+            AppState.SetThemMode(_isDarkMode);
+        }
     }
     
     readonly MudTheme _lightTheme = new MudTheme

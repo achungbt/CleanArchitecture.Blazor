@@ -1,6 +1,8 @@
 using Blazored.LocalStorage;
 using MudBlazor.Services;
 using CleanArchitecture.Blazor.Data;
+using CleanArchitecture.Blazor.Shared;
+using DevExpress.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
+builder.Services.AddSingleton<AppState>();
+builder.WebHost.UseWebRoot("wwwroot");
+builder.WebHost.UseStaticWebAssets();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
